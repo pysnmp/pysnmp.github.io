@@ -43,8 +43,9 @@ mibs
 :Channels: HTTPS (``https://pysnmp.github.io/mibs/asn1/<MODULE>``), archive,
    OCI images
 
-The MIB distribution. Not a package -- there is nothing to install; you point
-pysmi at it, unpack it, or mount it. It is what lets an engine say
+The MIB distribution. A distribution pip does not resolve: point pysmi at the
+served tree and use it live, or install it locally from the archive or an OCI
+image. It is what lets an engine say
 ``IF-MIB::ifOperStatus.1 = down`` instead of ``...1.8.1 = 2``, and it is
 optional: pysnmp starts without it on the standard modules it ships.
 

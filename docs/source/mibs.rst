@@ -6,18 +6,21 @@ answering ``1.3.6.1.2.1.2.2.1.8.1`` tells you the value is ``2``; with it, the
 same answer reads ``IF-MIB::ifOperStatus.1 = down``. :repo:`mibs` is where this
 organization publishes those modules.
 
-It is a distribution rather than a package: nothing to ``pip install``, several
-ways to get at the same content.
+It is a distribution, though not one ``pip`` resolves. You can use it live or
+install it locally, and the content is the same either way:
 
-- **Over HTTPS**, one module per request, which is what pysmi fetches from by
-  default. No index -- the tree is generated, and a listing of several thousand
-  files would not help anyone. Browse :repo:`mibs` to see what is there.
-- **As an archive**, for build systems and air-gapped sites that would rather
-  fetch once than reach out per module.
-- **As OCI images**, to mount alongside a container that needs the modules
-  without giving it egress.
+- **Live over HTTPS**, one module per request, which is what pysmi fetches from
+  by default. No index -- the tree is generated, and a listing of several
+  thousand files would not help anyone. Browse :repo:`mibs` to see what is
+  there.
+- **Installed from the archive**, for build systems and air-gapped sites that
+  would rather fetch once than reach out per module.
+- **Installed as an OCI image**, to mount alongside a container that needs the
+  modules without giving it egress.
 
-The examples below use the HTTPS channel because it needs no setup.
+The examples below use the live channel because it needs no setup. Everything
+they do works the same against a local copy -- see
+`Pointing pysmi somewhere else`_.
 
 Resolving a name
 ----------------

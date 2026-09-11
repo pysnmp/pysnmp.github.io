@@ -23,10 +23,10 @@ Two of the four repositories here are what you install and use directly:
      - :docs:`pysnmp`
      - The engine. SNMP v1, v2c and v3 as manager, agent or proxy, on asyncio.
    * - :repo:`mibs`
-     - served, not installed
+     - live over HTTPS, or installed locally
      - :doc:`the distribution <mibs>`
-     - The MIB distribution: thousands of modules over HTTPS, as an archive,
-       and as OCI images.
+     - The MIB distribution: thousands of modules, used live over HTTPS or
+       installed locally from the archive or an OCI image.
 
 The other two sit underneath and most people never import them. pysnmp pulls
 in what it needs:
