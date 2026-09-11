@@ -10,7 +10,7 @@ name = "pysnmp-site"
 version = "0.0.0"
 description = "The pysnmp organization site at https://pysnmp.github.io/"
 license = "BSD-2-Clause"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = "README.md"
 dependencies = []
 
@@ -22,8 +22,9 @@ repository = "https://github.com/pysnmp/pysnmp.github.io"
 # pin, because the site shares their conf.py conventions.
 [dependency-groups]
 dev = [
-    "sphinx >=7.0.0,<9.0.0",
-    "myst-parser>=4.0.0,<6.0.0",
+    "sphinx >=9.1.0,<10.0.0",
+    "furo >=2025.12.19",
+    "myst-parser >=5.1.0,<6.0.0",
     "ruff >=0.4.0,<1.0.0",
 ]
 
@@ -36,7 +37,7 @@ package = false
 
 [tool.ruff]
 line-length = 88
-target-version = "py311"
+target-version = "py312"
 extend-exclude = ["docs/build"]
 
 [tool.ruff.lint]

@@ -59,36 +59,68 @@ Start here
 
    $ pip install 'pysnmplib[compile]'
 
-The ``compile`` extra pulls in pysmi. Without it pysnmp still speaks SNMP --
-it ships the standard modules an engine resolves at start-up -- but it cannot
-read a MIB it does not already have, and reading those is most of what makes
-SNMP legible. Install it plain (``pip install pysnmplib``) only if you know
-you will never name an object outside the standard set.
+The ``compile`` extra pulls in pysmi, the MIB compiler. Without it pysnmp still
+speaks SNMP -- it ships the standard modules an engine resolves at start-up --
+but it cannot read a MIB it does not already have, and reading those is most of
+what makes SNMP legible.
+
+Here is what that buys you. A ``linkDown`` trap arrives as bare numbers; the
+same three varbinds are resolved twice, once against an engine that has only
+the modules pysnmp ships, and once against the MIB corpus over HTTPS:
 
 .. code-block:: python
 
-   import asyncio
+   from pysnmp.smi import builder, compiler, rfc1902, view
 
-   from pysnmp.hlapi.asyncio import *
-
-
-   async def run():
-       snmpEngine = SnmpEngine()
-       errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
-           snmpEngine,
-           CommunityData("public", mpModel=0),
-           UdpTransportTarget(("localhost", 161)),
-           ContextData(),
-           ObjectType(ObjectIdentity("SNMPv2-MIB", "sysDescr", 0)),
-       )
-
-       for varBind in varBinds:
-           print(" = ".join(x.prettyPrint() for x in varBind))
-
-       snmpEngine.transportDispatcher.closeDispatcher()
+   # Exactly what a linkDown trap carries on the wire.
+   trap = [
+       ("1.3.6.1.6.3.1.1.4.1.0", "1.3.6.1.6.3.1.1.5.3"),
+       ("1.3.6.1.2.1.2.2.1.1.1", 1),
+       ("1.3.6.1.2.1.2.2.1.8.1", 2),
+   ]
 
 
-   asyncio.run(run())
+   def show(mibView):
+       for oid, value in trap:
+           varBind = rfc1902.ObjectType(rfc1902.ObjectIdentity(oid), value)
+           try:
+               varBind.resolveWithMib(mibView)
+               print(varBind.prettyPrint())
+           except Exception as exc:
+               print(f"{oid} = {value}   <- {exc}")
+
+
+   print("without the corpus:")
+   show(view.MibViewController(builder.MibBuilder()))
+
+   print("\nwith the corpus:")
+   mibBuilder = builder.MibBuilder()
+   compiler.addMibCompiler(
+       mibBuilder, sources=["https://pysnmp.github.io/mibs/asn1/@mib@"]
+   )
+   mibBuilder.loadModules("SNMPv2-MIB", "IF-MIB")
+   show(view.MibViewController(mibBuilder))
+
+.. code-block:: text
+
+   without the corpus:
+   1.3.6.1.6.3.1.1.4.1.0 = 1.3.6.1.6.3.1.1.5.3   <- MIB object ObjectIdentity('1.3.6.1.6.3.1.1.4.1.0') is not OBJECT-TYPE (MIB not loaded?)
+   1.3.6.1.2.1.2.2.1.1.1 = 1   <- MIB object ObjectIdentity('1.3.6.1.2.1.2.2.1.1.1') is not OBJECT-TYPE (MIB not loaded?)
+   1.3.6.1.2.1.2.2.1.8.1 = 2   <- MIB object ObjectIdentity('1.3.6.1.2.1.2.2.1.8.1') is not OBJECT-TYPE (MIB not loaded?)
+
+   with the corpus:
+   SNMPv2-MIB::snmpTrapOID.0 = IF-MIB::linkDown
+   IF-MIB::ifIndex.1 = 1
+   IF-MIB::ifOperStatus.1 = down
+
+``IF-MIB`` is not among the modules pysnmp ships, so the first run cannot name
+any of it -- the trap is three numbers and an integer. The second compiles
+``IF-MIB`` from the corpus on first use and reads out an interface going down,
+with ``2`` rendered as ``down`` because the module's textual convention says
+so. :doc:`mibs` covers the corpus and its other channels.
+
+A worked manager example -- a GET against a live agent -- is in the
+:docs:`pysnmp`.
 
 That is the high-level API, which is where almost everyone should start. Under
 it sits the v3 architecture -- message processing, security models, access
