@@ -47,7 +47,7 @@ jobs:
       # directory if the Pages source is ever pointed back at a branch.
       - name: Disable Jekyll
         run: touch docs/build/.nojekyll
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs/build
 
