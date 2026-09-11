@@ -1,67 +1,76 @@
-# .github
+# pysnmp.github.io
 
-Two things live here: the organisation's GitHub configuration, and the source
-of the landing page at
-**<https://pysnmp.github.io/.github/>**.
+The source of <https://pysnmp.github.io/> — the front page of the
+[pysnmp organization](https://github.com/pysnmp). It says what the organization
+maintains and points at each project's own documentation; it is not the
+documentation for any one of them.
 
-## The site
+Those live in their own repositories and publish to their own paths under the
+same domain:
 
-`www/` is the source; `_site/` is what a build produces and is not committed.
-The page is generated from one content file, so adding a project or moving a
-documentation URL is an edit to TOML rather than to markup.
+| Site | Built from |
+| --- | --- |
+| <https://pysnmp.github.io/> | this repository |
+| <https://pysnmp.github.io/pysnmp/> | [pysnmp/pysnmp](https://github.com/pysnmp/pysnmp) |
+| <https://pysnmp.github.io/pysmi/> | [pysnmp/pysmi](https://github.com/pysnmp/pysmi) |
+| <https://pysnmp.github.io/pyasn1/> | [pysnmp/pyasn1](https://github.com/pysnmp/pyasn1) |
+| <https://pysnmp.github.io/mibs/> | [pysnmp/mibs](https://github.com/pysnmp/mibs) |
 
-```
-www/
-├── build.py      the generator: renders templates against site.toml
-├── site.toml     every claim the page makes -- projects, endpoints, example
-├── templates/    Jinja2, extending base.html.jinja
-└── static/       stylesheet, logo and favicon (shared with the Sphinx docs)
-```
+A project page is served from its own repository's GitHub Pages, so nothing
+here can break one — and nothing here should duplicate one either. Link out
+instead; a copy of an API reference is a copy that goes stale.
 
-Build it:
+## Building it
 
-```bash
-uv sync
-uv run python www/build.py          # writes ./_site
-python -m http.server -d _site      # http://localhost:8000
-```
+Sphinx, with the same theme and the same flags the library repositories use for
+their documentation:
 
-`build.py` fails the build when `site.toml` is missing a field the templates
-need or when a referenced asset is absent, so CI catches a broken page before
-it is published rather than after.
-
-Every link on the page is relative, so the built tree serves correctly from
-this repository's project page and would serve unchanged from an organisation
-root (a `pysnmp.github.io` repository) if the site is ever moved there.
-
-## CI
-
-| Workflow | What it does |
-|---|---|
-| `ci.yml` | pre-commit, Ruff, mypy, and a build of the site uploaded as an artifact so a pull request can be reviewed as the rendered page |
-| `site-publish.yml` | builds and pushes to `gh-pages` on a push to `main` that touches `www/`, and on dispatch |
-| `commit-conventions.yml` | commitlint over a pull request's commits, the same check the other repositories run |
-
-`gh-pages` holds exactly what the build produced: the publish job clears the
-branch before copying, so a file the site no longer emits leaves the branch
-with it and a re-run repairs whatever is there.
-
-## Toolchain
-
-The same one the rest of the organisation uses: [uv](https://docs.astral.sh/uv/)
-for environments and locking, [Ruff](https://docs.astral.sh/ruff/) for lint and
-formatting, mypy in strict mode, and pre-commit over all of it. Python 3.14.
-
-```bash
-uv sync
-pre-commit install
+```console
+$ uv sync --locked
+$ uv run --locked --group dev sphinx-build -n -W --keep-going -b html docs/source docs/build
+$ python -m http.server -d docs/build
 ```
 
-## The projects this page points at
+`-n` makes an unresolvable cross-reference a warning and `-W` makes every
+warning an error, so a dead `:doc:` reference fails the build rather than
+shipping. CI runs exactly that command, and so does the deployment.
 
-| | |
-|---|---|
-| [pysnmp](https://github.com/pysnmp/pysnmp) | the SNMP v1/v2c/v3 engine |
-| [pysmi](https://github.com/pysnmp/pysmi) | the SMI MIB parser and compiler |
-| [pyasn1](https://github.com/pysnmp/pyasn1) | ASN.1 types and BER/CER/DER codecs |
-| [mibs](https://github.com/pysnmp/mibs) | the MIB corpus, served over HTTP |
+Check the outbound links — most of this site is links — with:
+
+```console
+$ uv run --locked --group dev sphinx-build -b linkcheck docs/source docs/linkcheck
+```
+
+That runs weekly in CI rather than on every pull request; see
+[`.github/workflows/linkcheck.yml`](.github/workflows/linkcheck.yml).
+
+## Layout
+
+```
+docs/source/
+├── conf.py        Sphinx configuration, theme, the :repo: and :docs: roles
+├── index.rst      the landing page
+├── projects.rst   what each repository is and when to reach for it
+├── mibs.rst       the MIB archive and how the libraries fetch from it
+├── community.rst  reporting, contributing, security
+├── history.rst    the fork lineage, and which PyPI package is which
+└── .static/       logo, favicon and a few lines of CSS over alabaster
+```
+
+`conf.py` defines two roles that keep URLs out of the prose: `` :repo:`pysmi` ``
+links to the repository and `` :docs:`pysmi` `` to its documentation site.
+
+## Deployment
+
+A push to `main` runs [`.github/workflows/pages.yml`](.github/workflows/pages.yml),
+which builds the site and deploys it as a Pages artifact.
+
+**This requires the repository's Pages source to be set to "GitHub Actions"**
+(Settings → Pages → Build and deployment → Source). While it is set to a
+branch, GitHub runs Jekyll over `main` and ignores the workflow.
+
+## Contributing
+
+Same toolchain and the same commit conventions as every other repository here:
+see [CONTRIBUTING.md](https://github.com/pysnmp/.github/blob/main/CONTRIBUTING.md).
+Run `pre-commit install` once per checkout.

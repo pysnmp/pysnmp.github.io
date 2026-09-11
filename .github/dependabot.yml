@@ -1,0 +1,23 @@
+version: 2
+
+# A site, not a package: nothing here is ever resolved by an installer, so no
+# bump needs a version and none of these scopes mean anything to a release.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "ci(actions)"
+
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

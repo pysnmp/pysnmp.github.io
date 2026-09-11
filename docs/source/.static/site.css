@@ -1,0 +1,24 @@
+/* Small additions to alabaster for a landing page that is mostly a directory
+   of links. Everything else -- type, colour, spacing -- is the theme's, so
+   this site and the three project sites stay recognisably the same site. */
+
+.project-table td:first-child {
+    white-space: nowrap;
+}
+
+/* `pip install ...` cells read as commands, not prose. */
+.project-table code {
+    white-space: nowrap;
+}
+
+/* The lead paragraph under the title on the front page. */
+p.lead {
+    font-size: 1.15em;
+    line-height: 1.5;
+}
+
+/* Alabaster puts no separation between a definition list's terms, which is
+   what the per-project sections on the projects page are built out of. */
+dl.field-list > dt {
+    margin-top: 0.6em;
+}

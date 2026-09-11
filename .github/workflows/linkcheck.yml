@@ -1,0 +1,39 @@
+name: Link check
+
+# This site is mostly links to other people's pages, so the links are the thing
+# most likely to be wrong -- and they rot on someone else's schedule, not on
+# ours. Hence a weekly run rather than a check on every pull request: a GitHub
+# or PyPI blip should not fail an unrelated change to the prose.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      # Not -W: a broken link should be reported as a failed step with the
+      # whole list in the output, not as a build that stopped at the first one.
+      # linkcheck's own exit status already fails the job.
+      - name: Check links
+        run: >
+          uv run --locked --group dev
+          sphinx-build -b linkcheck
+          -d "${RUNNER_TEMP}/doctrees" docs/source docs/linkcheck
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: linkcheck-output
+          path: docs/linkcheck/output.txt

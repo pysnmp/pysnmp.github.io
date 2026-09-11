@@ -1,0 +1,65 @@
+name: Publish site
+
+# Publishes https://pysnmp.github.io/ from docs/source on every push to main.
+#
+# This deploys through the Pages build artifact rather than by committing HTML
+# to a branch, which is what the library repositories do for their versioned
+# documentation. The difference is deliberate: those sites keep every released
+# version side by side and need a branch they can add a directory to, while
+# this one only ever describes the present.
+#
+# The repository's Pages source has to be set to "GitHub Actions" for this to
+# do anything. If it is still set to a branch, GitHub runs Jekyll over main and
+# ignores this workflow entirely.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deployment at a time, and never cancel one in flight: cancelling a
+# deployment half way leaves the live site in whatever state it reached.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - name: Build site
+        run: >
+          uv run --locked --group dev
+          sphinx-build -n -W --keep-going -b html
+          -d "${RUNNER_TEMP}/doctrees" docs/source docs/build
+      # Pages serves the artifact as-is and does not run Jekyll over it, so
+      # this is belt and braces -- it is what stops Jekyll eating the _static
+      # directory if the Pages source is ever pointed back at a branch.
+      - name: Disable Jekyll
+        run: touch docs/build/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,14 +1,24 @@
-# The built site. Published to the gh-pages branch by CI, never committed to
-# main -- www/ is the source.
-_site/
+# Sphinx
+docs/build/
 
 # Python
+*.pyc
 __pycache__/
-*.py[cod]
 .venv/
-.mypy_cache/
-.ruff_cache/
+venv*/
 
-# Editors
+# Tooling caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Written by the commitlint install in
+# .github/workflows/commit-conventions.yml, and by anyone running that check
+# locally.
+node_modules/
+
+# Editors and platforms
 .idea/
-*.swp
+.vscode/
+*.sw?
+.DS_Store

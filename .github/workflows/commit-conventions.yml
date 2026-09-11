@@ -1,18 +1,19 @@
 name: Commit conventions
 
-# The version and the release notes are computed from the commit messages, so a
-# message semantic-release cannot read is a defect that only surfaces at release
-# time -- as a release that does not happen, or as notes with a hole in them.
-# This is where it is caught instead, while the message can still be reworded.
+# Nothing is released from this repository -- a push to main republishes the
+# site and that is all. The convention is checked anyway: the site is where a
+# contributor's first pull request to the organization often lands, and the one
+# they learn fixing a typo here is the one they bring to pysnmp, where the
+# message is what the version number and the release notes are computed from.
 #
-# Only pull requests are checked. Both long-lived branches move by merge, so
-# every commit that reaches them passes through here first.
+# Only pull requests are checked. main moves by merge, so every commit that
+# reaches it passes through here first.
 on:
   # `edited` as well as the defaults: retargeting a pull request changes the
   # base, and so changes the range of commits this lints. Without it a check
   # that ran against the old base stays on the pull request as its verdict.
   pull_request:
-    branches: [main, next]
+    branches: [main]
     types: [opened, synchronize, reopened, edited]
 
 concurrency:
