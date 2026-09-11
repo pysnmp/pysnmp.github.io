@@ -6,6 +6,12 @@ pysmi and pyasn1 sit underneath and are reached through pysnmp unless you are
 doing something unusual. Each publishes its own documentation; this page says
 what each is for and when you would go to it directly.
 
+.. note::
+
+   mibs is content rather than a library, so it has no PyPI distribution and
+   no release line to track. What it shares with the other three is the
+   toolchain, the commit conventions and the documentation theme.
+
 pysnmp
 ------
 
@@ -40,17 +46,23 @@ mibs
 ----
 
 :Repository: :repo:`mibs`
-:Channels: HTTPS (``https://pysnmp.github.io/mibs/asn1/<MODULE>``), archive,
-   OCI images
+:Channels: HTTPS (``https://pysnmp.github.io/mibs/asn1/<MODULE>``), release
+   archives, OCI images
+:Documentation: :docs:`mibs`
 
 The MIB distribution. A distribution pip does not resolve: point pysmi at the
-served tree and use it live, or install it locally from the archive or an OCI
-image. It is what lets an engine say
-``IF-MIB::ifOperStatus.1 = down`` instead of ``...1.8.1 = 2``, and it is
+published tree and use it live, or install it locally from a release archive or
+an OCI image -- the content is the same either way. It is what lets an engine
+say ``IF-MIB::ifOperStatus.1 = down`` instead of ``...1.8.1 = 2``, and it is
 optional: pysnmp starts without it on the standard modules it ships.
 
-See :doc:`mibs` for resolving a name, translating a trap, and overriding a
-module with a local copy.
+Published beside the modules are an OID index and ``core.db``, a SQLite
+rendering of the whole corpus that answers from an OID to a name, a syntax and
+an access level without compiling anything -- which is what a trap receiver
+needs and an anchor index cannot give it.
+
+Its documentation covers resolving a name, translating a trap, overriding a
+module with a local copy, and what each channel carries.
 
 pysmi
 -----
@@ -62,9 +74,11 @@ pysmi
 The MIB compiler. It parses ASN.1 MIB sources -- SMIv1, SMIv2 and the de-facto
 dialects that vendors ship -- and writes them out as pysnmp modules or as JSON.
 
-It ships the ``mibdump`` and ``mibcopy`` command-line tools, and it can pull
+It ships the ``mibdump``, ``mibcopy`` and ``mibcorpus`` command-line tools, and
+it can pull
 sources from a directory, a ZIP archive, or over HTTP, which is how the
-:doc:`MIB archive <mibs>` gets used.
+:docs:`MIB distribution <mibs>` gets used. Its ``mibcorpus`` driver is what
+builds that distribution.
 
 You need pysmi when you have a vendor MIB and want to refer to its objects by
 name. You do not need it to run pysnmp: the standard modules an engine
@@ -89,8 +103,8 @@ ASN.1 too, and this is a general implementation of the standard.
 How they are maintained
 -----------------------
 
-The three libraries share a toolchain deliberately, so that a change in one is
-a change you already know how to make in the others:
+All four repositories share a toolchain deliberately, so that a change in one
+is a change you already know how to make in the others:
 
 - `uv <https://docs.astral.sh/uv/>`_ with a committed lockfile;
   ``uv sync --locked`` reproduces exactly what CI runs.

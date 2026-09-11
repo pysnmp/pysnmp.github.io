@@ -18,13 +18,13 @@ Two of the four repositories here are what you install and use directly:
      - Install
      - Documentation
      - What it is
-   * - :repo:`pysnmp`
+   * - :docs:`pysnmp <pysnmp>`
      - ``pip install 'pysnmplib[compile]'``
      - :docs:`pysnmp`
      - The engine. SNMP v1, v2c and v3 as manager, agent or proxy, on asyncio.
-   * - :repo:`mibs`
+   * - :docs:`mibs <mibs>`
      - live over HTTPS, or installed locally
-     - :doc:`the distribution <mibs>`
+     - :docs:`mibs`
      - The MIB distribution: thousands of modules, used live over HTTPS or
        installed locally from the archive or an OCI image.
 
@@ -40,11 +40,11 @@ in what it needs:
      - Install
      - Documentation
      - What it is
-   * - :repo:`pysmi`
+   * - :docs:`pysmi <pysmi>`
      - with ``pysnmplib[compile]``
      - :docs:`pysmi`
      - The MIB compiler. Turns ASN.1 MIB sources into pysnmp modules or JSON.
-   * - :repo:`pyasn1`
+   * - :docs:`pyasn1 <pyasn1>`
      - with ``pysnmplib``
      - :docs:`pyasn1`
      - The codec. ASN.1 types with BER, CER and DER.
@@ -117,7 +117,8 @@ the modules pysnmp ships, and once against the MIB corpus over HTTPS:
 any of it -- the trap is three numbers and an integer. The second compiles
 ``IF-MIB`` from the corpus on first use and reads out an interface going down,
 with ``2`` rendered as ``down`` because the module's textual convention says
-so. :doc:`mibs` covers the corpus and its other channels.
+so. The :docs:`mibs` covers the other channels -- release archives and OCI
+images -- and the OID index and corpus database published beside the modules.
 
 A worked manager example -- a GET against a live agent -- is in the
 :docs:`pysnmp`.
@@ -155,13 +156,12 @@ reaches this layer by hand.
 And underneath all three, **mibs** supplies the module definitions themselves.
 An engine works without it, on the standard modules pysnmp ships; it is what
 you add when you want to name a vendor's objects rather than count OID arcs.
-See :doc:`mibs`.
+See the :docs:`mibs`.
 
 .. toctree::
    :maxdepth: 2
    :caption: This site
 
    projects
-   mibs
    community
    history
