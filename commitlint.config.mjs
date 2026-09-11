@@ -1,7 +1,9 @@
-// The commit convention the other pysnmp repositories use, kept here so a
-// contributor writes messages the same way whichever repository they are in.
-// Nothing is released from this repository, so a malformed message costs no
-// release note -- it costs the shared habit, which is the point of checking it.
+// Commit messages here follow the same convention as the library repositories.
+// Nothing is released from this repository -- a push to main republishes the
+// site and that is all -- but the site is where a contributor's first pull
+// request to the organization often lands, and the habit picked up fixing a
+// typo here carries over to pysnmp, where the message is the input to the
+// release rather than decoration.
 //
 // One file, two places. The commit-msg hook in .pre-commit-config.yaml checks a
 // message as it is written; .github/workflows/commit-conventions.yml checks
@@ -10,8 +12,10 @@
 export default {
   extends: ["@commitlint/config-conventional"],
   rules: {
-    // The same set the sibling repositories allow, restated here so it stays
-    // put if the shared preset ever widens it.
+    // The same list the library repositories accept, restated here so the set
+    // stays put if the shared preset ever widens it. Anything outside it is a
+    // typo -- a "feature:" or "bugfix:" commit parses as no type at all, and
+    // over in pysnmp that means it drops out of the release notes.
     "type-enum": [
       2,
       "always",
@@ -31,14 +35,15 @@ export default {
     ],
 
     // Bodies are written by tools as often as by hand -- a dependabot body
-    // carries compare links, which do not wrap to a column and are not worth
-    // failing over.
+    // carries compare links -- and those do not wrap to a column. Not worth
+    // failing a commit over.
     "body-max-line-length": [0],
     "footer-max-line-length": [0],
 
     // The subject is prose and starts with whatever word it starts with --
-    // "fix: Windows path handling" is not a style error. The type stays lower
-    // case (type-case, from the shared preset).
+    // "docs: PySNMP is two words on the front page" is not a style error. The type
+    // stays lower case (type-case, from the shared preset), because that is
+    // what semantic-release matches its release rules on elsewhere.
     "subject-case": [0],
   },
 };

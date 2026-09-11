@@ -1,6 +1,5 @@
-# pre-commit installs only the pre-commit hook type by default, which would
-# leave the commit-msg hook below configured but never run. Naming both here
-# makes a plain `pre-commit install` install both.
+# The same hooks the library repositories install. mypy is not here: the only
+# Python in this repository is docs/source/conf.py, which Sphinx exec()s.
 default_install_hook_types: [pre-commit, commit-msg]
 
 repos:
@@ -10,22 +9,15 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
-    hooks:
-      - id: mypy
-        args: [--ignore-missing-imports]
-        # jinja2 ships py.typed, so the hook's own environment needs it for
-        # the Environment and Template annotations in build.py to resolve.
-        additional_dependencies: [jinja2]
-        files: ^www/
 
-  # The same check .github/workflows/commit-conventions.yml runs, against the
-  # same commitlint.config.mjs, at the point where the message is written --
-  # rewording a message before it exists is a retype, after it exists it is a
-  # rebase. `pre-commit install` picks the commit-msg hook type up from
-  # default_install_hook_types above; an existing checkout has to run it once
-  # more for the hook to be installed at all.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.26.0
     hooks:

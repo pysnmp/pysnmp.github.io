@@ -1,74 +1,63 @@
+# The organization's front page at https://pysnmp.github.io/, built with
+# Sphinx -- the same generator, theme and flags the three library repositories
+# use for their own documentation, so the four sites look and behave like one.
+#
+# Nothing is packaged or published from here. The layout, the lockfile, the
+# ruff configuration and the commit conventions match pysnmp, pysmi and pyasn1
+# so that editing the site is the same motion as editing their docs.
 [project]
-name = "pysnmp-org-site"
+name = "pysnmp-site"
 version = "0.0.0"
-description = "The pysnmp organisation landing page"
-requires-python = ">=3.14"
+description = "The pysnmp organization site at https://pysnmp.github.io/"
 license = "BSD-2-Clause"
+requires-python = ">=3.11"
+readme = "README.md"
 dependencies = []
 
-# Nothing here is published to PyPI: this repository builds one static site and
-# carries the organisation's shared GitHub configuration. uv still needs a
-# project table to hang the dependency group and the tool settings off, so the
-# project is declared and left unbuildable -- there is no [build-system] and
-# no package to install.
+[project.urls]
+homepage = "https://pysnmp.github.io/"
+repository = "https://github.com/pysnmp/pysnmp.github.io"
 
+# PEP 735, and the same sphinx and myst-parser floors the library repositories
+# pin, because the site shares their conf.py conventions.
 [dependency-groups]
 dev = [
-    "jinja2>=3.1.6",
-    "mypy>=1.14",
-    "ruff>=0.8",
+    "sphinx >=7.0.0,<9.0.0",
+    "myst-parser >=4.0.0,<5.0.0",
+    "ruff >=0.4.0,<1.0.0",
 ]
 
 [tool.uv]
-# `uv sync` on a project with no build backend would try to install the project
-# itself and fail. The site is a script run out of the checkout, not a package.
 package = false
 
+# ---------------------------------------------------------------------------
+# Linting / formatting
+# ---------------------------------------------------------------------------
+
 [tool.ruff]
-target-version = "py314"
 line-length = 88
+target-version = "py311"
+extend-exclude = ["docs/build"]
 
 [tool.ruff.lint]
-# The rule set pyasn1, pysmi and pysnmp share, so a contributor moving between
-# the repositories meets the same lint. D1 on top of it, as in pysmi: this tree
-# is small and new, so every public thing in it carries a docstring.
+# The rule set the library repositories share. There is one Python file here --
+# docs/source/conf.py -- and it is held to the same standard as theirs.
 select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # pyflakes
-    "I",      # isort
-    "UP",     # pyupgrade
-    "B",      # flake8-bugbear
-    "S",      # flake8-bandit (security)
-    "SIM",    # flake8-simplify
-    "BLE",    # flake8-blind-except
-    "G",      # flake8-logging-format (keep logging interpolation lazy)
-    "LOG",    # flake8-logging (logger misuse)
-    "FLY",    # flynt (static str.join -> f-string)
-    "C4",     # flake8-comprehensions
-    "RSE",    # flake8-raise
-    "RUF",    # ruff-specific rules
-    "PL",     # pylint
-    "TRY",    # tryceratops
-    "D1",     # pydocstyle: every public thing carries a docstring
+    "E", "W", "F", "I", "UP", "B", "S", "SIM", "BLE", "G", "LOG",
+    "FLY", "C4", "RSE", "RUF", "PL", "TRY", "D",
 ]
 ignore = [
-    # Shared with pyasn1, pysmi and pysnmp.
     "E501",     # line-too-long -- ruff format decides where lines break
-    "PLR0911",  # too-many-return-statements
-    "PLR0912",  # too-many-branches
-    "PLR0913",  # too-many-arguments
-    "PLR0915",  # too-many-statements
-    "PLR2004",  # magic-value-comparison
-    "TRY003",   # raise-vanilla-args -- message text is part of the error contract
+    "SIM108",   # if-else-block-instead-of-if-exp -- readability preference
+    "TRY003",   # raise-vanilla-args -- message text is part of the error
+    "D401",     # non-imperative-mood
 ]
 
-[tool.ruff.lint.isort]
-known-first-party = ["www"]
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
-[tool.mypy]
-python_version = "3.14"
-files = ["www"]
-ignore_missing_imports = true
-warn_unreachable = true
-strict = true
+[tool.ruff.lint.per-file-ignores]
+# A Sphinx configuration file is a flat list of assignments Sphinx exec()s:
+# there is nothing to document beyond the module docstring, and `copyright`
+# shadowing a builtin is the name Sphinx reads.
+"docs/source/conf.py" = ["A001", "D100"]
