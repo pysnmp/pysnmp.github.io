@@ -17,7 +17,7 @@ pysnmp
      - Documentation
      - What it is
    * - :repo:`pysnmp`
-     - ``pip install pysnmplib``
+     - ``pip install --pre pysnmplib``
      - :docs:`pysnmp`
      - SNMP v1/v2c/v3 engine -- manager, agent and proxy, asyncio throughout.
    * - :repo:`pysmi`
@@ -38,7 +38,16 @@ Start here
 
 .. code-block:: console
 
-   $ pip install pysnmplib
+   $ pip install --pre pysnmplib
+
+.. note::
+
+   ``--pre`` is not decoration. pysnmp 6.0 is in release candidate and is the
+   line being maintained: it is what the code below runs on and what the rest
+   of this site describes. A plain ``pip install pysnmplib`` resolves 5.0.24,
+   whose ``pysnmp-pyasn1`` requirement predates the current releases of that
+   package and which fails to import against the one it pulls in. Drop the
+   flag once 6.0 is generally available.
 
 .. code-block:: python
 
@@ -96,10 +105,10 @@ and the high-level API.
 **mibs** is the archive the other two fall back to when a module is not on
 disk. See :doc:`mibs`.
 
-pysnmp ships the standard MIB modules its engine resolves at start-up, so a
-plain ``pip install pysnmplib`` needs neither pysmi nor the archive at run
-time. Compiling vendor MIBs while the engine is running is the extra:
-``pip install 'pysnmplib[compile]'``.
+pysnmp ships the standard MIB modules its engine resolves at start-up, so an
+engine starts with neither pysmi nor the archive present. Compiling vendor
+MIBs while the engine is running is the extra:
+``pip install --pre 'pysnmplib[compile]'``.
 
 .. toctree::
    :maxdepth: 2

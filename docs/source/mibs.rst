@@ -57,9 +57,9 @@ of a vendor MIB is a snapshot, and the vendor's is authoritative.
 
 pysnmp does not depend on the archive to start. The modules its engine
 resolves during start-up are compiled into the package already, which is why
-``pip install pysnmplib`` works on a machine with no network access. The
-archive matters when you are compiling a module you do not have, which is what
-``pip install 'pysnmplib[compile]'`` and pysmi are for.
+an engine starts on a machine with no network access. The archive matters when
+you are compiling a module you do not have, which is what
+``pip install --pre 'pysnmplib[compile]'`` and pysmi are for.
 
 .. warning::
 

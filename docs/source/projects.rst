@@ -9,7 +9,8 @@ pysnmp
 ------
 
 :Repository: :repo:`pysnmp`
-:PyPI: `pysnmplib <https://pypi.org/project/pysnmplib/>`_
+:PyPI: `pysnmplib <https://pypi.org/project/pysnmplib/>`_ (6.0 is in release
+   candidate: ``pip install --pre pysnmplib``)
 :Documentation: :docs:`pysnmp`
 
 The SNMP engine. It implements SNMPv1, SNMPv2c and SNMPv3 as a manager, as an
@@ -52,8 +53,8 @@ sources from a directory, a ZIP archive, or over HTTP, which is how the
 You need pysmi when you have a vendor MIB and want to refer to its objects by
 name. You do not need it to run pysnmp: the standard modules an engine
 resolves at start-up are compiled already and shipped inside pysnmp, so pysmi
-is an optional extra (``pip install 'pysnmplib[compile]'``) rather than a
-dependency.
+is an optional extra (``pip install --pre 'pysnmplib[compile]'``) rather
+than a dependency.
 
 pyasn1
 ------
