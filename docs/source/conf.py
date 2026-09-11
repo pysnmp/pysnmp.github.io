@@ -46,28 +46,17 @@ extlinks_detect_hardcoded_links = True
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "alabaster"
+html_theme = "furo"
 
-# The same theme, logo and tagline the three project sites use, so moving from
-# here into any of them does not look like leaving.
+# The same theme the three project documentation sites use, so moving between
+# them is moving within one site. furo supplies its own sidebar and needs no
+# html_sidebars; the logo is a theme option rather than the standard setting.
 html_theme_options = {
-    "logo": "logo.svg",
-    "description": "<p align=left><i><b>Brewing free software for the greater good</i></b></p>",
-    "show_powered_by": False,
-    "github_user": "pysnmp",
-    "github_repo": "pysnmp",
-    "github_button": True,
-    "github_type": "star",
-    "fixed_sidebar": True,
-    "show_relbars": False,
-}
-
-html_sidebars = {
-    "**": [
-        "about.html",
-        "navigation.html",
-        "searchbox.html",
-    ]
+    "light_logo": "logo.svg",
+    "dark_logo": "logo.svg",
+    "source_repository": "https://github.com/pysnmp/pysnmp.github.io/",
+    "source_branch": "main",
+    "source_directory": "docs/source/",
 }
 
 html_title = "pysnmp"

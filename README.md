@@ -51,7 +51,7 @@ docs/source/
 ├── conf.py        Sphinx configuration, theme, the :repo: and :docs: roles
 ├── index.rst      the landing page
 ├── projects.rst   what each repository is and when to reach for it
-├── mibs.rst       the MIB archive and how the libraries fetch from it
+├── mibs.rst       the MIB distribution, resolving names and translating traps
 ├── community.rst  reporting, contributing, security
 ├── history.rst    the fork lineage, and which PyPI package is which
 └── .static/       logo, favicon and a few lines of CSS over alabaster

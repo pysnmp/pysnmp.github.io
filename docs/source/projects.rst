@@ -1,16 +1,16 @@
 Projects
 ========
 
-Four repositories, one toolchain. Each publishes its own versioned
-documentation; this page says what each one is for and when you would reach
-for it directly.
+Four repositories, one toolchain. pysnmp and mibs are what most people use;
+pysmi and pyasn1 sit underneath and are reached through pysnmp unless you are
+doing something unusual. Each publishes its own documentation; this page says
+what each is for and when you would go to it directly.
 
 pysnmp
 ------
 
 :Repository: :repo:`pysnmp`
-:PyPI: `pysnmplib <https://pypi.org/project/pysnmplib/>`_ (6.0 is in release
-   candidate: ``pip install --pre pysnmplib``)
+:PyPI: `pysnmplib <https://pypi.org/project/pysnmplib/>`_
 :Documentation: :docs:`pysnmp`
 
 The SNMP engine. It implements SNMPv1, SNMPv2c and SNMPv3 as a manager, as an
@@ -36,6 +36,21 @@ Reach past the high-level API when you are building something that is not a
 single request -- a command responder, a proxy between SNMP versions, a
 notification receiver that has to survive its own authorization failures.
 
+mibs
+----
+
+:Repository: :repo:`mibs`
+:Channels: HTTPS (``https://pysnmp.github.io/mibs/asn1/<MODULE>``), archive,
+   OCI images
+
+The MIB distribution. Not a package -- there is nothing to install; you point
+pysmi at it, unpack it, or mount it. It is what lets an engine say
+``IF-MIB::ifOperStatus.1 = down`` instead of ``...1.8.1 = 2``, and it is
+optional: pysnmp starts without it on the standard modules it ships.
+
+See :doc:`mibs` for resolving a name, translating a trap, and overriding a
+module with a local copy.
+
 pysmi
 -----
 
@@ -53,8 +68,8 @@ sources from a directory, a ZIP archive, or over HTTP, which is how the
 You need pysmi when you have a vendor MIB and want to refer to its objects by
 name. You do not need it to run pysnmp: the standard modules an engine
 resolves at start-up are compiled already and shipped inside pysnmp, so pysmi
-is an optional extra (``pip install --pre 'pysnmplib[compile]'``) rather
-than a dependency.
+is an optional extra (``pip install 'pysnmplib[compile]'``) rather than a
+dependency.
 
 pyasn1
 ------
@@ -69,14 +84,6 @@ decoders that can work over a stream rather than a complete buffer.
 It is maintained here because SNMP depends on it, but it is not SNMP-specific
 and never was -- LDAP, X.509, Kerberos and a long tail of other protocols are
 ASN.1 too, and this is a general implementation of the standard.
-
-mibs
-----
-
-:Repository: :repo:`mibs`
-:Served at: ``https://pysnmp.github.io/mibs/asn1/<MODULE>``
-
-The MIB archive. Not a package -- a website. See :doc:`mibs`.
 
 How they are maintained
 -----------------------

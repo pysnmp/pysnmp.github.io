@@ -3,13 +3,15 @@ pysnmp
 
 .. rst-class:: lead
 
-   Pure-Python SNMP, from the wire up: an SNMP engine, the MIB compiler that
-   feeds it, the ASN.1 codec underneath both, and the MIB archive they read
-   from. No C extensions and no Net-SNMP bindings -- Python all the way down.
+   Pure-Python SNMP. An engine that speaks v1, v2c and v3, and a MIB
+   distribution that lets it talk about managed objects by name instead of by
+   number. No C extensions and no Net-SNMP bindings.
+
+Two of the four repositories here are what you install and use directly:
 
 .. list-table::
    :header-rows: 1
-   :widths: 12 26 20 42
+   :widths: 12 30 16 42
    :class: project-table
 
    * - Project
@@ -17,62 +19,108 @@ pysnmp
      - Documentation
      - What it is
    * - :repo:`pysnmp`
-     - ``pip install --pre pysnmplib``
+     - ``pip install 'pysnmplib[compile]'``
      - :docs:`pysnmp`
-     - SNMP v1/v2c/v3 engine -- manager, agent and proxy, asyncio throughout.
-   * - :repo:`pysmi`
-     - ``pip install pysnmp-pysmi``
-     - :docs:`pysmi`
-     - MIB compiler: ASN.1 SMIv1/SMIv2 sources into pysnmp modules or JSON.
-   * - :repo:`pyasn1`
-     - ``pip install pysnmp-pyasn1``
-     - :docs:`pyasn1`
-     - ASN.1 types and BER/CER/DER codecs -- what the other two are built on.
+     - The engine. SNMP v1, v2c and v3 as manager, agent or proxy, on asyncio.
    * - :repo:`mibs`
-     - --
-     - :doc:`the archive <mibs>`
-     - The MIB modules pysmi and pysnmp fetch when one is not on disk.
+     - served, not installed
+     - :doc:`the distribution <mibs>`
+     - The MIB distribution: thousands of modules over HTTPS, as an archive,
+       and as OCI images.
+
+The other two sit underneath and most people never import them. pysnmp pulls
+in what it needs:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 30 16 42
+   :class: project-table
+
+   * - Project
+     - Install
+     - Documentation
+     - What it is
+   * - :repo:`pysmi`
+     - with ``pysnmplib[compile]``
+     - :docs:`pysmi`
+     - The MIB compiler. Turns ASN.1 MIB sources into pysnmp modules or JSON.
+   * - :repo:`pyasn1`
+     - with ``pysnmplib``
+     - :docs:`pyasn1`
+     - The codec. ASN.1 types with BER, CER and DER.
+
+Reach for them directly when you are compiling MIBs outside an engine, or
+using ASN.1 for something that is not SNMP at all.
 
 Start here
 ----------
 
 .. code-block:: console
 
-   $ pip install --pre pysnmplib
+   $ pip install 'pysnmplib[compile]'
 
-.. note::
+The ``compile`` extra pulls in pysmi, the MIB compiler. Without it pysnmp still
+speaks SNMP -- it ships the standard modules an engine resolves at start-up --
+but it cannot read a MIB it does not already have, and reading those is most of
+what makes SNMP legible.
 
-   ``--pre`` is not decoration. pysnmp 6.0 is in release candidate and is the
-   line being maintained: it is what the code below runs on and what the rest
-   of this site describes. A plain ``pip install pysnmplib`` resolves 5.0.24,
-   whose ``pysnmp-pyasn1`` requirement predates the current releases of that
-   package and which fails to import against the one it pulls in. Drop the
-   flag once 6.0 is generally available.
+Here is what that buys you. A ``linkDown`` trap arrives as bare numbers; the
+same three varbinds are resolved twice, once against an engine that has only
+the modules pysnmp ships, and once against the MIB corpus over HTTPS:
 
 .. code-block:: python
 
-   import asyncio
+   from pysnmp.smi import builder, compiler, rfc1902, view
 
-   from pysnmp.hlapi.asyncio import *
-
-
-   async def run():
-       snmpEngine = SnmpEngine()
-       errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
-           snmpEngine,
-           CommunityData("public", mpModel=0),
-           UdpTransportTarget(("localhost", 161)),
-           ContextData(),
-           ObjectType(ObjectIdentity("SNMPv2-MIB", "sysDescr", 0)),
-       )
-
-       for varBind in varBinds:
-           print(" = ".join(x.prettyPrint() for x in varBind))
-
-       snmpEngine.transportDispatcher.closeDispatcher()
+   # Exactly what a linkDown trap carries on the wire.
+   trap = [
+       ("1.3.6.1.6.3.1.1.4.1.0", "1.3.6.1.6.3.1.1.5.3"),
+       ("1.3.6.1.2.1.2.2.1.1.1", 1),
+       ("1.3.6.1.2.1.2.2.1.8.1", 2),
+   ]
 
 
-   asyncio.run(run())
+   def show(mibView):
+       for oid, value in trap:
+           varBind = rfc1902.ObjectType(rfc1902.ObjectIdentity(oid), value)
+           try:
+               varBind.resolveWithMib(mibView)
+               print(varBind.prettyPrint())
+           except Exception as exc:
+               print(f"{oid} = {value}   <- {exc}")
+
+
+   print("without the corpus:")
+   show(view.MibViewController(builder.MibBuilder()))
+
+   print("\nwith the corpus:")
+   mibBuilder = builder.MibBuilder()
+   compiler.addMibCompiler(
+       mibBuilder, sources=["https://pysnmp.github.io/mibs/asn1/@mib@"]
+   )
+   mibBuilder.loadModules("SNMPv2-MIB", "IF-MIB")
+   show(view.MibViewController(mibBuilder))
+
+.. code-block:: text
+
+   without the corpus:
+   1.3.6.1.6.3.1.1.4.1.0 = 1.3.6.1.6.3.1.1.5.3   <- MIB object ObjectIdentity('1.3.6.1.6.3.1.1.4.1.0') is not OBJECT-TYPE (MIB not loaded?)
+   1.3.6.1.2.1.2.2.1.1.1 = 1   <- MIB object ObjectIdentity('1.3.6.1.2.1.2.2.1.1.1') is not OBJECT-TYPE (MIB not loaded?)
+   1.3.6.1.2.1.2.2.1.8.1 = 2   <- MIB object ObjectIdentity('1.3.6.1.2.1.2.2.1.8.1') is not OBJECT-TYPE (MIB not loaded?)
+
+   with the corpus:
+   SNMPv2-MIB::snmpTrapOID.0 = IF-MIB::linkDown
+   IF-MIB::ifIndex.1 = 1
+   IF-MIB::ifOperStatus.1 = down
+
+``IF-MIB`` is not among the modules pysnmp ships, so the first run cannot name
+any of it -- the trap is three numbers and an integer. The second compiles
+``IF-MIB`` from the corpus on first use and reads out an interface going down,
+with ``2`` rendered as ``down`` because the module's textual convention says
+so. :doc:`mibs` covers the corpus and its other channels.
+
+A worked manager example -- a GET against a live agent -- is in the
+:docs:`pysnmp`.
 
 That is the high-level API, which is where almost everyone should start. Under
 it sits the v3 architecture -- message processing, security models, access
@@ -87,28 +135,27 @@ the pysnmp repository, and are rendered into the
 How the pieces fit
 ------------------
 
-An SNMP engine speaks a binary protocol about objects named in MIB modules, so
-there are three layers, and they are three repositories:
+An SNMP engine speaks a binary protocol about objects named in MIB modules,
+so there are three layers. You use the top one:
 
-**pyasn1** encodes and decodes. BER on the wire; CER and DER where a
-representation has to be reproducible byte for byte.
+**pysnmp** is the engine: message processing for v1, v2c and v3, USM
+authentication and privacy, VACM access control, the transport dispatcher,
+and the high-level API above all of it.
 
-**pysmi** reads ASN.1 MIB sources -- SMIv1, SMIv2, and the dialects real
-vendors actually ship -- and renders them as pysnmp modules or as JSON. It is
-what turns ``IF-MIB::ifInOctets`` from a string into an object identifier and
-a type.
+**pysmi** reads ASN.1 MIB sources -- SMIv1, SMIv2 and the dialects vendors
+actually ship -- and renders them as pysnmp modules or JSON. It is what turns
+``IF-MIB::ifInOctets`` from a string into an object identifier and a type.
+pysnmp drives it for you; you call it directly only to compile MIBs outside
+an engine, with ``mibdump``.
 
-**pysnmp** is the engine above both: message processing for v1, v2c and v3,
-USM authentication and privacy, VACM access control, the transport dispatcher,
-and the high-level API.
+**pyasn1** encodes and decodes: BER on the wire, CER and DER where a
+representation has to be reproducible byte for byte. Nothing in normal use
+reaches this layer by hand.
 
-**mibs** is the archive the other two fall back to when a module is not on
-disk. See :doc:`mibs`.
-
-pysnmp ships the standard MIB modules its engine resolves at start-up, so an
-engine starts with neither pysmi nor the archive present. Compiling vendor
-MIBs while the engine is running is the extra:
-``pip install --pre 'pysnmplib[compile]'``.
+And underneath all three, **mibs** supplies the module definitions themselves.
+An engine works without it, on the standard modules pysnmp ships; it is what
+you add when you want to name a vendor's objects rather than count OID arcs.
+See :doc:`mibs`.
 
 .. toctree::
    :maxdepth: 2
