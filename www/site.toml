@@ -1,0 +1,189 @@
+# Everything the site says about the organisation and its projects. build.py
+# renders the templates from this file and nothing else, so a release, a moved
+# documentation URL or a new project is an edit here rather than to markup.
+
+[site]
+title = "PySNMP"
+tagline = "SNMP for Python"
+description = """
+Four projects, one stack: an SNMP engine, the MIB compiler it resolves modules \
+with, the ASN.1 codec underneath both, and the MIB corpus they read. All pure \
+Python, BSD licensed, and maintained together.
+"""
+org = "pysnmp"
+org_url = "https://github.com/pysnmp"
+
+# Relative so the site serves unchanged from a project page under
+# /<repo>/ and from the organisation root, should it ever move there.
+[[site.nav]]
+label = "Projects"
+url = "#projects"
+
+[[site.nav]]
+label = "MIB corpus"
+url = "#mibs"
+
+[[site.nav]]
+label = "Get started"
+url = "#start"
+
+[[site.nav]]
+label = "GitHub"
+url = "https://github.com/pysnmp"
+
+# The layer each project sits at, drawn as the stack on the landing page and
+# used to order the cards. Lower numbers sit higher in the diagram.
+[[projects]]
+id = "pysnmp"
+name = "pysnmp"
+layer = 1
+role = "The engine"
+tagline = "SNMP v1, v2c and v3 for Python"
+description = """
+A complete SNMPv1/v2c/v3 engine: command generator and responder, notification \
+originator and receiver, USM authentication and privacy, VACM access control, \
+and an asyncio API. The MIB layer resolves symbolic names through pysmi.
+"""
+repo = "https://github.com/pysnmp/pysnmp"
+docs = "https://pysnmp.github.io/pysnmp/"
+pypi = "https://pypi.org/project/pysnmplib/"
+package = "pysnmplib"
+install = "uv add pysnmplib"
+highlights = [
+    "SNMPv1, v2c and v3 in one engine",
+    "USM with SHA-2 authentication and AES-192/256 privacy",
+    "View-based access control (RFC 3415)",
+    "asyncio transport and API",
+]
+
+[[projects]]
+id = "pysmi"
+name = "pysmi"
+layer = 2
+role = "The compiler"
+tagline = "SMI MIB parser and compiler"
+description = """
+Turns ASN.1 MIBs into pysnmp modules, JSON documents or a corpus database. \
+Understands SMIv1, SMIv2 and the de-facto dialects, and pulls missing modules \
+from directories, ZIP archives or HTTP. pysnmp calls it behind the scenes; \
+mibdump, mibcopy and mibcorpus expose it directly.
+"""
+repo = "https://github.com/pysnmp/pysmi"
+docs = "https://pysnmp.github.io/pysmi/"
+pypi = "https://pypi.org/project/pysnmp-pysmi/"
+package = "pysnmp-pysmi"
+install = "uv add pysnmp-pysmi"
+highlights = [
+    "SMIv1, SMIv2 and de-facto dialects",
+    "Emits pysnmp modules, JSON and SQLite corpora",
+    "mibdump, mibcopy and mibcorpus command-line tools",
+    "210 standard modules bundled",
+]
+
+[[projects]]
+id = "pyasn1"
+name = "pyasn1"
+layer = 3
+role = "The codec"
+tagline = "ASN.1 types and codecs"
+description = """
+Generic ASN.1 types (X.208) with standards-compliant BER, CER and DER codecs. \
+Written for SNMP, general enough for anything built on ASN.1, and able to \
+work over streams of serialised data rather than whole buffers.
+"""
+repo = "https://github.com/pysnmp/pyasn1"
+docs = "https://pysnmp.github.io/pyasn1/"
+pypi = "https://pypi.org/project/pysnmp-pyasn1/"
+package = "pysnmp-pyasn1"
+install = "uv add pysnmp-pyasn1"
+highlights = [
+    "ASN.1 types to X.208",
+    "BER, CER and DER codecs",
+    "Decodes from streams, not just buffers",
+    "No dependencies, thread-safe",
+]
+
+[[projects]]
+id = "mibs"
+name = "mibs"
+layer = 4
+role = "The corpus"
+tagline = "5,500 MIB modules, served over HTTP"
+description = """
+The MIB collection the rest of the stack resolves against: standard modules \
+plus roughly 285 vendor trees, built reproducibly by pysmi's mibcorpus and \
+published as ASN.1 sources, JSON documents, an OID index and a corpus \
+database. Also shipped as OCI images and a Helm chart.
+"""
+repo = "https://github.com/pysnmp/mibs"
+docs = "https://github.com/pysnmp/mibs#readme"
+docs_label = "README"
+package = "ghcr.io/pysnmp/mibs/corpus"
+install = "https://pysnmp.github.io/mibs/asn1/@mib@"
+highlights = [
+    "5,510 modules, 767,870 nodes",
+    "ASN.1 sources, JSON documents and an OID index",
+    "core.db: the SMI model as SQLite, queried by OID",
+    "mibserver Helm chart and scratch-based OCI images",
+]
+
+# The corpus endpoints, listed on the site because they are the part of the
+# stack consumed over the wire rather than installed.
+[[endpoints]]
+path = "asn1/<MODULE>"
+url = "https://pysnmp.github.io/mibs/asn1/"
+description = "The MIB source, under its bare module name."
+
+[[endpoints]]
+path = "json/<MODULE>.json"
+url = "https://pysnmp.github.io/mibs/json/"
+description = "The same module as data: names, OIDs, syntax, access, status."
+
+[[endpoints]]
+path = "index-v2.csv"
+url = "https://pysnmp.github.io/mibs/index-v2.csv"
+description = "OID to module, one row per anchor. Supersedes index.csv."
+
+[[endpoints]]
+path = "standard.txt"
+url = "https://pysnmp.github.io/mibs/standard.txt"
+description = "The names of the standard modules in the corpus."
+
+# The snippet under "Get started". Kept here so the page has exactly one
+# source of truth and the template stays markup.
+[start]
+intro = """
+Installing the engine brings the compiler and the codec with it. Point it at \
+the corpus and it resolves any module in there on demand.
+"""
+install = "uv add pysnmplib"
+language = "python"
+code = '''
+import asyncio
+
+from pysnmp.hlapi.asyncio import *
+
+
+async def run():
+    snmpEngine = SnmpEngine()
+
+    errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
+        snmpEngine,
+        CommunityData("public", mpModel=1),
+        UdpTransportTarget(("localhost", 161)),
+        ContextData(),
+        # Resolved through pysmi, against the MIB corpus.
+        ObjectType(ObjectIdentity("SNMPv2-MIB", "sysDescr", 0)),
+    )
+
+    if errorIndication:
+        print(errorIndication)
+    else:
+        for varBind in varBinds:
+            print(" = ".join(x.prettyPrint() for x in varBind))
+
+    snmpEngine.transportDispatcher.closeDispatcher()
+
+
+asyncio.run(run())
+'''

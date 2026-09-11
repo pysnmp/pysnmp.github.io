@@ -1,0 +1,109 @@
+{% extends "base.html.jinja" %}
+
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">{{ site.org }}</p>
+    <h1>{{ site.tagline }}</h1>
+    <p class="lede">{{ site.description | trim }}</p>
+    <p class="hero-actions">
+      <a class="button primary" href="#start">Get started</a>
+      <a class="button" href="{{ site.org_url }}">Browse the source</a>
+    </p>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="wrap">
+    <h2>The projects</h2>
+    <p class="section-lede">
+      Each sits on the one below it. Install the top and you have the rest;
+      use any of them on its own if that is all you need.
+    </p>
+
+    <ol class="stack" aria-label="The stack, top to bottom">
+      {% for project in projects %}
+      <li class="stack-item">
+        <a href="#{{ project.id }}">
+          <span class="stack-name">{{ project.name }}</span>
+          <span class="stack-role">{{ project.role }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+
+    <div class="cards">
+      {% for project in projects %}
+      <article class="card" id="{{ project.id }}">
+        <header>
+          <h3>{{ project.name }}</h3>
+          <p class="card-tagline">{{ project.tagline }}</p>
+        </header>
+
+        <p>{{ project.description | trim }}</p>
+
+        <ul class="highlights">
+          {% for highlight in project.highlights %}
+          <li>{{ highlight }}</li>
+          {% endfor %}
+        </ul>
+
+        <p class="install"><code>{{ project.install }}</code></p>
+
+        <p class="card-links">
+          <a href="{{ project.docs }}">{{ project.get('docs_label', 'Documentation') }}</a>
+          <a href="{{ project.repo }}">Source</a>
+          {% if project.get('pypi') %}
+          <a href="{{ project.pypi }}">PyPI</a>
+          {% endif %}
+        </p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="mibs">
+  <div class="wrap">
+    <h2>The MIB corpus over HTTP</h2>
+    <p class="section-lede">
+      The corpus is the one part of the stack you consume over the wire rather
+      than install. These paths are stable; point a compiler or a MIB browser
+      straight at them.
+    </p>
+
+    <div class="table-scroll">
+      <table class="endpoints">
+        <thead>
+          <tr><th scope="col">Path</th><th scope="col">What it serves</th></tr>
+        </thead>
+        <tbody>
+          {% for endpoint in endpoints %}
+          <tr>
+            <th scope="row"><a href="{{ endpoint.url }}"><code>{{ endpoint.path }}</code></a></th>
+            <td>{{ endpoint.description }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="start">
+  <div class="wrap">
+    <h2>Get started</h2>
+    <p class="section-lede">{{ start.intro | trim }}</p>
+
+    <p class="install standalone"><code>{{ start.install }}</code></p>
+
+    <div class="table-scroll"><pre class="code"><code>{{ start.code | trim }}</code></pre></div>
+
+    <p class="footnote">
+      The agent and notification sides, the SNMPv3 security model and the
+      compiler's command-line tools are covered in each project's own
+      documentation, linked from the cards above.
+    </p>
+  </div>
+</section>
+{% endblock %}

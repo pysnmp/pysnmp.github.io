@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ site.title }} — {{ site.tagline }}{% endblock %}</title>
+<meta name="description" content="{{ site.description | trim }}">
+<link rel="icon" href="./static/favicon.ico" sizes="any">
+<link rel="stylesheet" href="./static/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="./">
+      <img src="./static/logo.svg" alt="" width="32" height="34">
+      <span>{{ site.title }}</span>
+    </a>
+    <nav aria-label="Site">
+      <ul>
+        {% for item in site.nav %}
+        <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <p>
+      Maintained by the <a href="{{ site.org_url }}">{{ site.org }}</a> organisation.
+      Every project here is under the 2-clause BSD licence.
+    </p>
+    <ul class="footer-links">
+      {% for project in projects %}
+      <li><a href="{{ project.repo }}">{{ project.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
