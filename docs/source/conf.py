@@ -77,9 +77,12 @@ linkcheck_anchors = False
 linkcheck_timeout = 30
 linkcheck_retries = 2
 linkcheck_ignore = [
-    # Every MIB module under here is generated, and the archive has no index to
-    # crawl -- a HEAD against the directory is a 404 by design.
-    r"https://pysnmp\.github\.io/mibs/.*",
+    # Every module under these two is generated and neither tree carries an
+    # HTML index, so a HEAD against the directory is a 404 by design. The
+    # distribution's own documentation sits at the site root and is checked
+    # like any other link.
+    r"https://pysnmp\.github\.io/mibs/asn1/.*",
+    r"https://pysnmp\.github\.io/mibs/json/.*",
     # Reporting forms: GitHub answers these with a login redirect for anyone
     # not signed in, which the checker reads as a failure.
     r"https://github\.com/pysnmp/[^/]+/security/advisories/new",
