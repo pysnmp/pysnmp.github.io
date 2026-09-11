@@ -1,0 +1,83 @@
+name: CI
+
+# What gates a pull request here: the shared hooks, the shared lint, and a
+# build of the site. The build is the test -- build.py validates site.toml and
+# the assets the templates reference, so a broken card or a missing stylesheet
+# fails here rather than on the published page.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      # pre-commit/action is archived at v3.0.1 and pins actions/cache@v4
+      # inside itself, which runs on the deprecated Node 20 runtime. Its steps
+      # are short enough to keep here instead, on a cache action that is not.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Run pre-commit
+        run: |
+          python -m pip install pre-commit
+          pre-commit run --show-diff-on-failure --color=always --all-files
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Run Ruff
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Run mypy
+        run: uv run mypy
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - name: Build the site
+        run: uv run --locked python www/build.py _site
+      # So a pull request can be reviewed as the rendered page and not only as
+      # a diff: the artifact is the exact tree publish would push.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: _site

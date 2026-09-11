@@ -1,0 +1,80 @@
+name: Publish-Site
+
+# Publishes the landing page to the gh-pages branch, which is what the sibling
+# repositories' docs-publish workflow does with their Sphinx builds. The branch
+# holds exactly what build.py produced -- the job replaces its contents rather
+# than merging into them, so a file dropped from the site leaves the branch too
+# and a re-run repairs whatever is there.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "www/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/site-publish.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: site-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build the site
+        run: uv run --locked python www/build.py _site
+
+      - name: Check out gh-pages
+        run: |
+          git fetch origin gh-pages --depth=1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            # -B puts the worktree on a local gh-pages branch reset to the
+            # remote one. Without it `git worktree add <path> origin/gh-pages`
+            # checks out a detached HEAD, the commit below lands on no branch,
+            # and `git push origin gh-pages` has no such local ref to push.
+            git worktree add -B gh-pages ../site origin/gh-pages
+          else
+            git worktree add --detach ../site
+            git -C ../site checkout --orphan gh-pages
+            git -C ../site rm -rq --cached . || true
+            find ../site -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          fi
+
+      - name: Stage the site
+        # The site is the whole branch, so what is there goes first. Anything
+        # the build no longer emits is then gone from the published tree
+        # instead of lingering as an orphan the index still serves.
+        run: |
+          find ../site -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R _site/. ../site/
+
+      - name: Commit and push
+        working-directory: ../site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "site unchanged"
+            exit 0
+          fi
+          git commit -m "site: publish ${GITHUB_SHA::7}"
+          git push origin gh-pages
