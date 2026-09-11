@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PySNMP — SNMP for Python</title>
+<meta name="description" content="Four projects, one stack: an SNMP engine, the MIB compiler it resolves modules with, the ASN.1 codec underneath both, and the MIB corpus they read. All pure Python, BSD licensed, and maintained together.">
+<link rel="icon" href="./static/favicon.ico" sizes="any">
+<link rel="stylesheet" href="./static/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="./">
+      <img src="./static/logo.svg" alt="" width="32" height="34">
+      <span>PySNMP</span>
+    </a>
+    <nav aria-label="Site">
+      <ul>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#mibs">MIB corpus</a></li>
+        <li><a href="#start">Get started</a></li>
+        <li><a href="https://github.com/pysnmp">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">pysnmp</p>
+    <h1>SNMP for Python</h1>
+    <p class="lede">Four projects, one stack: an SNMP engine, the MIB compiler it resolves modules with, the ASN.1 codec underneath both, and the MIB corpus they read. All pure Python, BSD licensed, and maintained together.</p>
+    <p class="hero-actions">
+      <a class="button primary" href="#start">Get started</a>
+      <a class="button" href="https://github.com/pysnmp">Browse the source</a>
+    </p>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="wrap">
+    <h2>The projects</h2>
+    <p class="section-lede">
+      Each sits on the one below it. Install the top and you have the rest;
+      use any of them on its own if that is all you need.
+    </p>
+
+    <ol class="stack" aria-label="The stack, top to bottom">
+      <li class="stack-item">
+        <a href="#pysnmp">
+          <span class="stack-name">pysnmp</span>
+          <span class="stack-role">The engine</span>
+        </a>
+      </li>
+      <li class="stack-item">
+        <a href="#pysmi">
+          <span class="stack-name">pysmi</span>
+          <span class="stack-role">The compiler</span>
+        </a>
+      </li>
+      <li class="stack-item">
+        <a href="#pyasn1">
+          <span class="stack-name">pyasn1</span>
+          <span class="stack-role">The codec</span>
+        </a>
+      </li>
+      <li class="stack-item">
+        <a href="#mibs">
+          <span class="stack-name">mibs</span>
+          <span class="stack-role">The corpus</span>
+        </a>
+      </li>
+    </ol>
+
+    <div class="cards">
+      <article class="card" id="pysnmp">
+        <header>
+          <h3>pysnmp</h3>
+          <p class="card-tagline">SNMP v1, v2c and v3 for Python</p>
+        </header>
+
+        <p>A complete SNMPv1/v2c/v3 engine: command generator and responder, notification originator and receiver, USM authentication and privacy, VACM access control, and an asyncio API. The MIB layer resolves symbolic names through pysmi.</p>
+
+        <ul class="highlights">
+          <li>SNMPv1, v2c and v3 in one engine</li>
+          <li>USM with SHA-2 authentication and AES-192/256 privacy</li>
+          <li>View-based access control (RFC 3415)</li>
+          <li>asyncio transport and API</li>
+        </ul>
+
+        <p class="install"><code>uv add pysnmplib</code></p>
+
+        <p class="card-links">
+          <a href="https://pysnmp.github.io/pysnmp/">Documentation</a>
+          <a href="https://github.com/pysnmp/pysnmp">Source</a>
+          <a href="https://pypi.org/project/pysnmplib/">PyPI</a>
+        </p>
+      </article>
+      <article class="card" id="pysmi">
+        <header>
+          <h3>pysmi</h3>
+          <p class="card-tagline">SMI MIB parser and compiler</p>
+        </header>
+
+        <p>Turns ASN.1 MIBs into pysnmp modules, JSON documents or a corpus database. Understands SMIv1, SMIv2 and the de-facto dialects, and pulls missing modules from directories, ZIP archives or HTTP. pysnmp calls it behind the scenes; mibdump, mibcopy and mibcorpus expose it directly.</p>
+
+        <ul class="highlights">
+          <li>SMIv1, SMIv2 and de-facto dialects</li>
+          <li>Emits pysnmp modules, JSON and SQLite corpora</li>
+          <li>mibdump, mibcopy and mibcorpus command-line tools</li>
+          <li>210 standard modules bundled</li>
+        </ul>
+
+        <p class="install"><code>uv add pysnmp-pysmi</code></p>
+
+        <p class="card-links">
+          <a href="https://pysnmp.github.io/pysmi/">Documentation</a>
+          <a href="https://github.com/pysnmp/pysmi">Source</a>
+          <a href="https://pypi.org/project/pysnmp-pysmi/">PyPI</a>
+        </p>
+      </article>
+      <article class="card" id="pyasn1">
+        <header>
+          <h3>pyasn1</h3>
+          <p class="card-tagline">ASN.1 types and codecs</p>
+        </header>
+
+        <p>Generic ASN.1 types (X.208) with standards-compliant BER, CER and DER codecs. Written for SNMP, general enough for anything built on ASN.1, and able to work over streams of serialised data rather than whole buffers.</p>
+
+        <ul class="highlights">
+          <li>ASN.1 types to X.208</li>
+          <li>BER, CER and DER codecs</li>
+          <li>Decodes from streams, not just buffers</li>
+          <li>No dependencies, thread-safe</li>
+        </ul>
+
+        <p class="install"><code>uv add pysnmp-pyasn1</code></p>
+
+        <p class="card-links">
+          <a href="https://pysnmp.github.io/pyasn1/">Documentation</a>
+          <a href="https://github.com/pysnmp/pyasn1">Source</a>
+          <a href="https://pypi.org/project/pysnmp-pyasn1/">PyPI</a>
+        </p>
+      </article>
+      <article class="card" id="mibs">
+        <header>
+          <h3>mibs</h3>
+          <p class="card-tagline">5,500 MIB modules, served over HTTP</p>
+        </header>
+
+        <p>The MIB collection the rest of the stack resolves against: standard modules plus roughly 285 vendor trees, built reproducibly by pysmi&#39;s mibcorpus and published as ASN.1 sources, JSON documents, an OID index and a corpus database. Also shipped as OCI images and a Helm chart.</p>
+
+        <ul class="highlights">
+          <li>5,510 modules, 767,870 nodes</li>
+          <li>ASN.1 sources, JSON documents and an OID index</li>
+          <li>core.db: the SMI model as SQLite, queried by OID</li>
+          <li>mibserver Helm chart and scratch-based OCI images</li>
+        </ul>
+
+        <p class="install"><code>https://pysnmp.github.io/mibs/asn1/@mib@</code></p>
+
+        <p class="card-links">
+          <a href="https://github.com/pysnmp/mibs#readme">README</a>
+          <a href="https://github.com/pysnmp/mibs">Source</a>
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="mibs">
+  <div class="wrap">
+    <h2>The MIB corpus over HTTP</h2>
+    <p class="section-lede">
+      The corpus is the one part of the stack you consume over the wire rather
+      than install. These paths are stable; point a compiler or a MIB browser
+      straight at them.
+    </p>
+
+    <div class="table-scroll">
+      <table class="endpoints">
+        <thead>
+          <tr><th scope="col">Path</th><th scope="col">What it serves</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href="https://pysnmp.github.io/mibs/asn1/"><code>asn1/&lt;MODULE&gt;</code></a></th>
+            <td>The MIB source, under its bare module name.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https://pysnmp.github.io/mibs/json/"><code>json/&lt;MODULE&gt;.json</code></a></th>
+            <td>The same module as data: names, OIDs, syntax, access, status.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https://pysnmp.github.io/mibs/index-v2.csv"><code>index-v2.csv</code></a></th>
+            <td>OID to module, one row per anchor. Supersedes index.csv.</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="https://pysnmp.github.io/mibs/standard.txt"><code>standard.txt</code></a></th>
+            <td>The names of the standard modules in the corpus.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="start">
+  <div class="wrap">
+    <h2>Get started</h2>
+    <p class="section-lede">Installing the engine brings the compiler and the codec with it. Point it at the corpus and it resolves any module in there on demand.</p>
+
+    <p class="install standalone"><code>uv add pysnmplib</code></p>
+
+    <div class="table-scroll"><pre class="code"><code>import asyncio
+
+from pysnmp.hlapi.asyncio import *
+
+
+async def run():
+    snmpEngine = SnmpEngine()
+
+    errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
+        snmpEngine,
+        CommunityData(&#34;public&#34;, mpModel=1),
+        UdpTransportTarget((&#34;localhost&#34;, 161)),
+        ContextData(),
+        # Resolved through pysmi, against the MIB corpus.
+        ObjectType(ObjectIdentity(&#34;SNMPv2-MIB&#34;, &#34;sysDescr&#34;, 0)),
+    )
+
+    if errorIndication:
+        print(errorIndication)
+    else:
+        for varBind in varBinds:
+            print(&#34; = &#34;.join(x.prettyPrint() for x in varBind))
+
+    snmpEngine.transportDispatcher.closeDispatcher()
+
+
+asyncio.run(run())</code></pre></div>
+
+    <p class="footnote">
+      The agent and notification sides, the SNMPv3 security model and the
+      compiler's command-line tools are covered in each project's own
+      documentation, linked from the cards above.
+    </p>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <p>
+      Maintained by the <a href="https://github.com/pysnmp">pysnmp</a> organisation.
+      Every project here is under the 2-clause BSD licence.
+    </p>
+    <ul class="footer-links">
+      <li><a href="https://github.com/pysnmp/pysnmp">pysnmp</a></li>
+      <li><a href="https://github.com/pysnmp/pysmi">pysmi</a></li>
+      <li><a href="https://github.com/pysnmp/pyasn1">pyasn1</a></li>
+      <li><a href="https://github.com/pysnmp/mibs">mibs</a></li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>
